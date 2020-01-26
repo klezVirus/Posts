@@ -280,7 +280,7 @@ You can use the following script, if you want, but flick2 should reach the inter
 ```bash
 cd /usr/share/nginx/
 mv serverchecker serverchecker.bck
-curl -ks http://www.redcrownsecurity.com/offsec-certs/oswe/reviews/vulnhub/res/serverchecker/serverchecker.tgz.txt -o serverchecker.tar.gz
+curl -ks https://github.com/klezVirus/Posts/raw/master/reviews/vulnhub/flick2/res/serverchecker.tar.gz -o serverchecker.tar.gz
 tar -xzvf serverchecker.tar.gz
 mv serverchecker-hardened serverchecker
 ```
