@@ -125,4 +125,4 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 
 ### Who I am
 
-I'm a just another-security-researcher with an insatiable hunger for knowledge.
+I'm a just another-security-passionate with an insatiable hunger for knowledge.
