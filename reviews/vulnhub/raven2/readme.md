@@ -75,7 +75,7 @@ PHPMailer versions prior to <strong>5.2.18</strong> (released December 2016) are
 
 Ignoring the fact that a public available exploit is available for PHPMailer, let's dig deeper into its implementation. 
 
-Following, we will dissect the vulnerability known as [CVE-2016-10033](https://github.com/opsxcq/exploit-CVE-2016-10033), trying to figure it on our own. The steps the sendmail routine follows can be summarised as following:
+Following, we will dissect the vulnerability known as [CVE-2016-10033](https://github.com/opsxcq/exploit-CVE-2016-10033), trying to figure it on our own. The steps that we will follow to exploit the sendmail routine can be summarised as following:
 
 1. Locate the vulnerable function
 2. Bypass the validation mechanism
