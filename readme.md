@@ -80,7 +80,7 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
     - Know how to exploit PHP insecure deserialsiation to achieve RCE
 * Source code analysis requirments
     - Source Code Analysis of 3 PHP files (Boringly simple)
-* OSWE Style Review:
+* OSWE Style Walkthrough:
     - [Pipe](./reviews/vulnhub/pipe)
 
 ##### Raven2
