@@ -77,8 +77,8 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 ##### Pipe
 
 * Challenges
-    - Know how to exploit PHP insecure deserialsiation to achieve RCE
-* Source code analysis requirments
+    - Know how to exploit PHP insecure deserialisation to achieve RCE
+* Source code analysis requirements
     - Source Code Analysis of 3 PHP files (Boringly simple)
 * OSWE Style Walkthrough:
     - [Pipe](./reviews/vulnhub/pipe)
@@ -88,16 +88,16 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 * Challenges
     - Detect missing input validation
     - Debug PHP app via code augmentation [big word, small task]
-* Source code analysis requirments
+* Source code analysis requirements
     - Source Code Analysis of PHPMailer (Important files: 2)
 * OSWE Style Walkthrough:
-    - [Raven](./reviews/vulnhub/raven)
+    - [Raven](./reviews/vulnhub/raven2)
 
 ##### Homeless
 
 * Challenges
     - Know a bit of hashing functions
-* Source code analysis requirments
+* Source code analysis requirements
     - Source Code Analysis of 3-4 PHP files
 * OSWE Style Walkthrough:
     - [Homeless](./reviews/vulnhub/homeless)
@@ -106,7 +106,7 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 
 * Challenges
     - Know how to exploit PHP Local File Inclusion to achieve RCE
-* Source code analysis requirments
+* Source code analysis requirements
     - Source Code Analysis of a few PHP files
 * OSWE Style Walkthrough:
     - [Ted](./reviews/vulnhub/ted)
