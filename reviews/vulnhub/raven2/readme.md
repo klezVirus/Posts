@@ -1,10 +1,10 @@
-### Raven - Remote Command Execution 
+### Raven2 - Remote Command Execution 
 
 #### Intro
 
 Within this walkthrough, I will skip any part not related to the web application exploitation, but for sake of consistency I would briefly explain what (and why) I skip.
 
-Raven web application is made on the top of wordpress, and a vulnerabity affecting the application can be found analysing a bunch of files only
+Raven2 web application is made on the top of wordpress, and a vulnerabity affecting the application can be found analysing a bunch of files only
 
 #### Vulnerability Discovery
 
