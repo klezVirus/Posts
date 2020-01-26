@@ -81,7 +81,7 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 * Source code analysis requirments
     - Source Code Analysis of 3 PHP files (Boringly simple)
 * OSWE Style Review:
-    - [Pipe](/offsec-certs/oswe/reviews/vulnhub/pipe.html)
+    - [Pipe](./reviews/vulnhub/pipe)
 
 ##### Raven2
 
@@ -91,7 +91,7 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 * Source code analysis requirments
     - Source Code Analysis of PHPMailer (Important files: 2)
 * OSWE Style Walkthrough:
-    - [Raven](/offsec-certs/oswe/reviews/vulnhub/raven.html)
+    - [Raven](./reviews/vulnhub/raven)
 
 ##### Homeless
 
@@ -100,7 +100,7 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 * Source code analysis requirments
     - Source Code Analysis of 3-4 PHP files
 * OSWE Style Walkthrough:
-    - [Homeless](/offsec-certs/oswe/reviews/vulnhub/homeless.html)
+    - [Homeless](./reviews/vulnhub/homeless)
 
 ##### Ted
 
@@ -109,7 +109,7 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 * Source code analysis requirments
     - Source Code Analysis of a few PHP files
 * OSWE Style Walkthrough:
-    - [Ted](/offsec-certs/oswe/reviews/vulnhub/ted.html)
+    - [Ted](./reviews/vulnhub/ted)
 
 ##### Flick2
 
@@ -120,7 +120,7 @@ For anyone else, they are fairly funny machines (mostly vault and arkham).
 * Source code analysis requirements
     - Little APK decompiled code analysis 
 * OSWE Style Walkthrough:
-    - [Flick2](/offsec-certs/oswe/reviews/vulnhub/flick2.html)
+    - [Flick2](./reviews/vulnhub/flick2)
     - Additional Exercise at the end
 
 ### Who I am

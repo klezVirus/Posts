@@ -1,4 +1,4 @@
-### Flick2 - Insecure Deserialisation
+### Flick2 - Remote Command Execution
 
 Within this walkthrough, I will skip any part not related to the web application exploitation, but for sake of consistency I would briefly explain what (and why) I skip.
 
@@ -273,7 +273,7 @@ echo "DONE"
 
 #### Exercise
 
-I prepared a "hardened version" (well, not so much) of the `serverchecker` API, you can find it [here](/offsec-certs/oswe/reviews/vulnhub/res/serverchecker/serverchecker.tgz.txt). Upload it to flick2, change the old directory with the new one and try to bypass the authentication and the filter on your own.
+I prepared a "hardened version" (well, not so much) of the `serverchecker` API, you can find it [here](./res/serverchecker.tar.gz). Upload it to flick2, change the old directory with the new one and try to bypass the authentication and the filter on your own.
 
 You can use the following script, if you want, but flick2 should reach the internet in order to do it:
 
