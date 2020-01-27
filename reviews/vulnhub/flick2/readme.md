@@ -275,6 +275,8 @@ echo "DONE"
 
 I prepared a "hardened version" (well, not so much) of the `serverchecker` API, you can find it [here](./res/serverchecker.tar.gz). Upload it to flick2, change the old directory with the new one and try to bypass the authentication and the filter on your own.
 
+**SPOILER ALERT:** The exploit script under the res directory is the solution to the exercise, so it's recommended not seeing that before completing the excercise.
+
 You can use the following script, if you want, but flick2 should reach the internet in order to do it:
 
 ```bash

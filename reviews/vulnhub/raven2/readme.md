@@ -32,7 +32,7 @@ drwxrwxrwx 5 root     root      4096 Nov  9  2018 wordpress
 
 Within the file, we can note the following piece of code, that loads the PHPMailer plugin, creates a message from user input parameters withouth any form of validation and tries to send it:
 
-```
+```php
  <?php
 if (isset($_REQUEST['action'])){
     $name=$_REQUEST['name'];
@@ -85,7 +85,8 @@ Following, we will dissect the vulnerability known as [CVE-2016-10033](https://g
 
 We'll start analysing PHPMailerAutoload.php, which is only a loader, as its name suggests, which aim is loading class.* files within the module directory. We're mainly interested in the class.phpmailer.php file, which contains the send() function called in contact.php. The send function, below, calls two other functions, preSend and postSend.
 
-```
+```php
+<?php
 public function send()
 {
     try {
