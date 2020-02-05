@@ -9,40 +9,39 @@ The method I'm presenting now, we'll allow us to discover the vulnerability with
 
 #### Vulnerability Discovery
 
-The application is made on top of PHP Laravel/Lumen framework. The application code can be found at `/usr/share/nginx/serverchecker`. As always, let' start with catching the overall application structure, using treee, clock or similar tools. Filtering out the not-interesting parts, the app structure would be like the folowing:
+The application is made on top of PHP Laravel/Lumen framework. The application code can be found at `/usr/share/nginx/serverchecker`. As always, let' start with catching the overall application structure, using tree, clock or similar tools. Filtering out the not-interesting parts, the app structure would be like the following:
 
 ```
 /usr/share/ngnix/serverchecker
 ├── public
-│   └── index.php
+│   └── index.php
 ├── server.php
 ├── bootstrap
-│   └── app.php
+│   └── app.php
 ├── app
-│   ├── Http
-│   │   ├── Controllers
-│   │   │   └── Controller.php
-│   │   ├── Middleware
-│   │   │   ├── ApiAuth.php
-│   │   │   └── ExampleMiddleware.php
-│   │   └── routes.php
-│   ├── Key.php
-│   └── [other dirs/files]
+│   ├── Http
+│   │   ├── Controllers
+│   │   │   └── Controller.php
+│   │   ├── Middleware
+│   │   │   ├── ApiAuth.php
+│   │   │   └── ExampleMiddleware.php
+│   │   └── routes.php
+│   ├── Key.php
+│   └── [other dirs/files]
 ├── database
-│   ├── factories
-│   ├── migrations
-│   └── seeds
-
+│   ├── factories
+│   ├── migrations
+│   └── seeds
 ├── storage
-│   ├── app
-│   ├── database.sqlite
-│   ├── framework
-│   └── logs
+│   ├── app
+│   ├── database.sqlite
+│   ├── framework
+│   └── logs
 └── vendor
     └── [other dirs/files]
 ```
 
-The `server.php` file, seems to be the file welcoming you when you try to access FLick2 from the outside, on port 443. So let's start our analysis with it and see what we can find:
+The `server.php` file, seems to be the file welcoming you when you try to access Flick2 from the outside, on port 443. So, let's start our analysis with it and see what we can find:
 
 ```php
 <?php
@@ -61,7 +60,7 @@ $app = require __DIR__.'/../bootstrap/app.php';
 $app->run();
 ```
 
-And so we arrive at the start of the real implementation in `/bootstrap/app.php`. As I said, the API is made on top of Lumen, so knowing how Lumen maps applications' "routes" (informally paths) and how it handle authentication, it may be possible to skip this part, but I do not recommend it during a thorough code analyis. Anyway, let's focus on the important bits of the file, below:
+And so, we arrive at the start of the real implementation in `/bootstrap/app.php`. As I said, the API is made on top of Lumen, so knowing how Lumen maps applications' "routes" (informally paths) and how it handles authentication, it may be possible to skip this part, but I do not recommend it during a thorough code analysis. Anyway, let's focus on the important bits of the file, below:
 
 ```php
 <?php
@@ -75,7 +74,7 @@ $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
 });
 return $app;
 ```
-Well, wonderful, now we know where is the authentication logic and where to find the routes and the controllers. Let's start analysing the routes file `/app/Http/routes.php` to see if we can find something interesting:
+Well, wonderful, now we know where is the authentication logic, and where to find the routes and the controllers. Let's start analysing the routes file `/app/Http/routes.php` to see if we can find something interesting:
 
 ```php
 <?php
@@ -132,7 +131,7 @@ $app->group(['prefix' => 'do', 'middleware' => 'api_auth'], function () use ($ap
     });
 ```
 
-All of your alarms should be ringing now, as that's actually a way to implement command execution. So it seems that in order to execute the command it's necessary to issue a HTTP GET REQUEST using an URL in the form `/do/cmd/$base64_encoded_command` where `/do` is the prefix given in the group definition.
+All of your alarms should be ringing now, as that's actually a way to implement command execution. So, it seems that in order to execute the command it's necessary to issue a HTTP GET REQUEST using an URL in the form `/do/cmd/$base64_encoded_command` where `/do` is the prefix given in the group definition.
 
 Ok, that's really fantastic. But is that all? If we take a deeper look, we can see that in order to make our command execute, we should first authenticate against the API:
 
@@ -140,7 +139,7 @@ Ok, that's really fantastic. But is that all? If we take a deeper look, we can s
 $app->group(['prefix' => 'do', 'middleware' => 'api_auth'], function () use ($app) {...}
 ```
 
-So let's take a step back and analyse the authentication logic in `/app/Http/Middleware/ApiAuth.php`:
+So, let's take a step back and analyse the authentication logic in `/app/Http/Middleware/ApiAuth.php`:
 
 ```php
 <?php namespace App\Http\Middleware;
@@ -220,7 +219,7 @@ As we've already seen, the application attempts to validate the command using a 
 if(0 < count(array_intersect(array_map('strtolower', explode(' ', $command)), $bad_commands))) {...}
 ```
 
-The creator of the app, says that this blacklisting method is **SUPER** FAIL, and that should be the point. He gave us even a bypass PoC, below:
+The creator of the app, says that this blacklisting method is **SUPER FAIL**, and that should be the point. He gave us even a bypass PoC, below:
 
 ```bash
 /do/cmd/$(echo -n "\$(echo "`echo 'uname -a' | base64`" | base64 -d)" | base64)
@@ -275,7 +274,7 @@ echo "DONE"
 
 I prepared a "hardened version" (well, not so much) of the `serverchecker` API, you can find it [here](./res/serverchecker.tar.gz). Upload it to flick2, change the old directory with the new one and try to bypass the authentication and the filter on your own.
 
-**SPOILER ALERT:** The exploit script under the res directory is the solution to the exercise, so it's recommended not seeing that before completing the excercise.
+**SPOILER ALERT:** The exploit script under the res directory is the solution to the exercise, so it's recommended not seeing that before completing the exercise.
 
 You can use the following script, if you want, but flick2 should reach the internet in order to do it:
 
@@ -289,4 +288,4 @@ mv serverchecker-hardened serverchecker
 
 #### Conclusion
 
-Good machine indeed, it may not be as complex as OSWE, but it's far above other machines of its kind. I advice to go for it, and to give a try to the "hardened" version as well, even if it's not that difficult.
+Good machine indeed, it may not be as complex as OSWE, but it's far above other machines of its kind. I advise to go for it, and to give a try to the "hardened" version as well, even if it's not that difficult.

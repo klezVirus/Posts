@@ -8,7 +8,7 @@ Ted is really a simple web application. The application is made of only 5 PHP fi
 
 #### Vulnerability Discovery
 
-We'll start looking at the index.php file, which containes just a login form, with a post action to authenticate.php 
+We'll start looking at the index.php file, which contains just a login form, with a post action to authenticate.php 
 
 ```html
 <form action="authenticate.php" method="post">
@@ -109,9 +109,9 @@ Analysing the `home.php`, we can immediately identify at least two vulnerabiliti
 A small note on PHP LFI to RCE:
 
 >There are multiple ways to achieve RCE from LFI in PHP, to exploit Ted it is necessary to have an understanding on how this process works. There are files
-on the filesystem which an attacker can modify even not having direct access to the machine, that are the log files. For example, it is possible to write php code in apache access.log with a crafted request, or to the auth.log with a crafted ssh login attempt, and so on. However, this files are usually not accessible to the www-data user, hence not really usable. For a brief list of all the techniques that can be used to achieve RCE, I would suggest going to the following site: [LFI-RCE](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion)
+on the filesystem which an attacker can modify even not having direct access to the machine, that are the log files. For example, it is possible to write php code in apache access.log with a crafted request, or to the auth.log with a crafted ssh login attempt, and so on. However, these files are usually not accessible to the www-data user, hence not really usable. For a brief list of all the techniques that can be used to achieve RCE, I would suggest going to the following site: [LFI-RCE](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion)
 
-So it's only necessary to find the correct file or techinque to use. Luckily, seeing the code make this process fairly easy. Infact, something at the very beginning of the `home.php` file should capture our attention, as for below snippet:
+So, it's only necessary to find the correct file or technique to use. Luckily, seeing the code make this process fairly easy. Indeed, something at the very beginning of the `home.php` file should capture our attention, as for below snippet:
 
 ```php
 1. <?php
@@ -124,7 +124,7 @@ So it's only necessary to find the correct file or techinque to use. Luckily, se
 8. ?>
 ```
 
-It may not be immediately obvious, aif you don't recall how sessions are maintained in PHP. The `$_SESSION` object, indeed, is stored as a file under a predefined path (in this case `/var/lib/php/sessions/`), and name, that is usually obtainined concatenating the sess_ prefix with the PHPSESSID value (i.e. `sess_0oqh1580kqa1q9s4srsbnue2b0`).
+It may not be immediately obvious, if you don't recall how sessions are maintained in PHP. The `$_SESSION` object, indeed, is stored as a file under a predefined path (in this case `/var/lib/php/sessions/`), and name, that is usually obtained concatenating the sess_ prefix with the PHPSESSID value (i.e. `sess_0oqh1580kqa1q9s4srsbnue2b0`).
 
 For that reason, as we can control a value in the $_SESSION object, we can use that to inject a PHP payload in the session file.
 
@@ -162,4 +162,4 @@ echo "[+] Done!";
 
 #### Conclusions
 
-Ted was somehow a funny machine, however, the small number of files to analyse, and the lack of complexity within the code, made it not enough of a challenge comparing it to the OSWE. 
+Ted was somehow a funny machine, however, the small number of files to analyse, and the lack of complexity within the code, made it not enough of a challenge comparing it to the OSWE.
